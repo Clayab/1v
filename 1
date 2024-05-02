@@ -1,0 +1,47 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
+##1
+df=pd.read_csv('clustering.csv')
+df
+df.isnull().sum()
+df.describe()
+df.info()
+###2
+plt.scatter(df['LoanAmount'],df['ApplicantIncome'])
+plt.show()
+###3
+scaler=StandardScaler()
+df[['LA_T','AI_T']]=scaler.fit_transform(df[['LoanAmount','ApplicantIncome']])
+df
+#elbow
+def optimise_k_means(data,max_k):
+    means=[]
+    inertias=[]
+    
+    for k in range(1,max_k):
+        kmeans=KMeans(n_clusters=k)
+        kmeans.fit(data)
+        
+        means.append(k)
+        inertias.append(kmeans.inertia_)
+        
+    fig = plt.figure(figsize=(10, 5))
+    plt.plot(means,inertias,'o-')
+    plt.xlabel('Num of Clusters')
+    plt.ylabel('Inertias')
+    plt.grid(True)
+    plt.show()
+optimise_k_means(df[['LA_T','AI_T']],10)
+#  n_cluster=4=>elbow
+###4
+kmeans=KMeans(n_clusters=4)
+kmeans.fit(df[['LA_T','AI_T']])
+df['kmeans_4']=kmeans.labels_
+df[['LA_T','AI_T','kmeans_4']]
+## predictions=kmeans_4
+###5
+plt.scatter(x=df['LA_T'],y=df['AI_T'],c=df['kmeans_4'])
+plt.show()
